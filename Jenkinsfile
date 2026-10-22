@@ -2,31 +2,26 @@ pipeline {
     agent any
 
     stages {
-
-        stage('Clone') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/chiranzeevidhub/sample-cicd-demo.git'
+                checkout scm
             }
         }
-
-        stage('Build') {
+        stage('Build/Test') {
             steps {
-                echo 'Build Successful'
+                echo 'Running tests...'
+                // e.g. sh 'npm test' or html validation
             }
         }
-
-        stage('Test') {
-            steps {
-                echo 'Testing Successful'
-            }
-        }
-
         stage('Deploy') {
             steps {
-                sh '''
-                sudo cp index.html /var/www/html/index.html
-                '''
+                sh 'cp -r index.html /var/www/html/'
+                // for a whole project: sh 'rsync -av --delete --exclude=".git" --exclude="Jenkinsfile" ./ /var/www/html/'
             }
         }
+    }
+    post {
+        success { echo 'Deployed successfully!' }
+        failure { echo 'Build failed.' }
     }
 }
